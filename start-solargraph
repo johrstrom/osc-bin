@@ -1,0 +1,14 @@
+#!/bin/sh
+
+IMG="solargraph:latest"
+
+RUBY="-v $HOME/.gem:$HOME/.gem"
+DEV="-v $HOME/ondemand/dev:$HOME/ondemand/dev"
+BIN="-v $HOME/dev-bin:$HOME/bin"
+BASH="-v $HOME/.local/etc/ood-container.bashrc:$HOME/.bashrc"
+
+MNTS="$RUBY $BASH $BIN $DEV"
+
+ARGS="--rm=true --security-opt label=disable --userns=keep-id -p 7658:7658"
+
+podman run $MNTS $ARGS $IMG /solargraph socket --host=0.0.0.0

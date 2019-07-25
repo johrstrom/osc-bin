@@ -1,0 +1,23 @@
+#!/bin/bash
+
+function clean_from() {
+  if [ $1 == "podman" ]; then
+      ls_cmd="podman container ls -a"
+      rm_cmd="podman container rm"
+
+  elif [ $1 == "buildah" ]; then
+      ls_cmd="buildah containers"
+      rm_cmd="buildah rm"
+  fi
+
+  containers=$( $ls_cmd | awk '{print $1}' | grep -v CONTAINER)
+
+  for c in $containers
+  do
+      $rm_cmd $c
+  done
+
+}
+
+clean_from "podman"
+clean_from "buildah"

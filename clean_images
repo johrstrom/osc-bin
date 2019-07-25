@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+images=$(buildah images -f "dangling=true" | awk '{print $3}' | grep -v IMAGE)
+
+for i in $images
+do
+	buildah rmi $i
+done
