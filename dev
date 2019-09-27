@@ -1,0 +1,8 @@
+#!/bin/sh
+
+source "$HOME/.config/ondemand/ood-server.env"
+
+ARGS="--rm=true --userns=keep-id --security-opt label=disable -it"
+ARGS="$ARGS $EXTRA_ARGS"
+
+podman run $ARGS ood-dev /bin/bash

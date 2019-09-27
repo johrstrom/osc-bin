@@ -1,0 +1,37 @@
+#!/bin/sh
+
+
+if [ -z $1 ]; then
+  echo 'you must specify $1 as [start/stop/restart]'
+  exit 1
+fi
+
+CMD=$1
+
+function stop_ctr(){
+  podman kill solargraph
+}
+
+function start_ctr(){
+  MNTS="-v $HOME/.gem:$HOME/.gem -v $HOME/.solargraph:$HOME/.solargraph"
+  MNTS="${MNTS} -v $HOME/.bundle:$HOME/.bundle"
+  MNTS="${MNTS} -v $HOME/src/misc/ctr-bin:$HOME/bin"
+  MNTS="${MNTS} -v $HOME/.config/ondemand/ood-container.bashrc:$HOME/.bashrc"
+
+  ARGS="${ARGS} --rm=true --security-opt label=disable --userns=keep-id"
+  ARGS="${ARGS} ${MNTS} -p 7658:7658 --name=solargraph"
+
+  CTR_CMD="$HOME/bin/ruby-wrapper solargraph socket --host=0.0.0.0"
+  podman run $ARGS ood-dev $CTR_CMD > /tmp/solargraph.out 2>&1 &
+}
+
+if [ "$CMD" == "start" ]; then
+  start_ctr
+elif [ "$CMD" == "stop" ]; then
+  stop_ctr
+elif [ "$CMD" == "restart" ]; then
+  stop_ctr
+  start_ctr
+else
+  echo "cmd '$CMD' not understood"
+fi
