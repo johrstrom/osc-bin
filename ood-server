@@ -1,0 +1,93 @@
+#!/bin/sh
+
+function show_help(){
+  echo "Helper script to run Open OnDemand Conainters."
+  echo "ood-server [OPTION] [start|stop|restart]"
+  echo ""
+  echo "  -h|--help   show this message"
+  echo "  -p|--port   specify the port you want to bind to"
+  echo "  -i|--img    specify the image you want to boot"
+}
+
+IMG="ood-${USER}:latest"
+CTR_NAME="ood"
+PORT="8080"
+
+for arg in "$@"
+do
+  case $arg in
+    -h|--help)
+    show_help
+    exit 0
+    ;;
+
+    -i|--image)
+    IMG=$2
+    #CTR_NAME=$IMG
+    shift
+    shift
+    ;;
+
+    -p|--port)
+    PORT=$2
+    shift
+    shift
+    ;;
+
+    start)
+    START=true
+    shift
+    ;;
+
+    stop)
+    STOP=true
+    shift
+    ;;
+
+    restart)
+    RESTART=true
+    shift
+    ;;
+esac
+done
+
+if [ -d "$HOME/ondemand/dev" ]; then
+  OOD_APP_DEV_DIR="$HOME/ondemand/dev"
+elif [ -z $OOD_APP_DEV_DIR ]; then
+  OOD_APP_DEV_DIR=$HOME
+fi
+
+# load extra stuff if you want
+EXTRAS_FILE="$HOME/.config/ondemand/ood-server.env"
+if [ -f "$EXTRAS_FILE" ]; then
+  . $EXTRAS_FILE
+fi
+
+ARGS="${ARGS} --rm=true --security-opt label=disable -v $OOD_APP_DEV_DIR:$HOME/ondemand/dev"
+ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:80 --name=$CTR_NAME"
+ARGS="${ARGS} --network=host"
+
+function start_server() {
+  LOG="/tmp/ood-container-$PORT.out"
+  podman run ${ARGS} ${IMG} >> $LOG 2>&1 &
+}
+
+function stop_server() {
+  podman kill "$CTR_NAME" >/dev/null 2>&1
+  return $?
+}
+
+if [ "$START" ]; then
+  start_server
+elif [ "$STOP" ]; then
+  stop_server
+elif [ "$RESTART" ]; then
+  stop_server
+  start_server
+else
+  echo "you must specify one of [stop,start,restart]"
+  exit 1
+fi
+
+
+  
