@@ -10,6 +10,7 @@ function show_help(){
 }
 
 IMG="ood-${USER}:latest"
+
 CTR_NAME="ood"
 PORT="8080"
 
@@ -23,13 +24,23 @@ do
 
     -i|--image)
     IMG=$2
-    #CTR_NAME=$IMG
     shift
     shift
     ;;
 
     -p|--port)
     PORT=$2
+    shift
+    shift
+    ;;
+
+    -n|--network)
+    HOST_NETWORK=true
+    shift
+    ;;
+
+    -c|--ctr-name)
+    CTR_NAME=$2
     shift
     shift
     ;;
@@ -64,12 +75,15 @@ if [ -f "$EXTRAS_FILE" ]; then
 fi
 
 ARGS="${ARGS} --rm=true --security-opt label=disable -v $OOD_APP_DEV_DIR:$HOME/ondemand/dev"
-ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:80 --name=$CTR_NAME"
-ARGS="${ARGS} --network=host"
+ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:8080 --name=$CTR_NAME"
+
+if [ $HOST_NETWORK ]; then
+  ARGS="${ARGS} --network=host"
+fi
 
 function start_server() {
   LOG="/tmp/ood-container-$PORT.out"
-  podman run ${ARGS} ${IMG} >> $LOG 2>&1 &
+  podman run ${ARGS} ${IMG} > $LOG 2>&1 &
 }
 
 function stop_server() {
