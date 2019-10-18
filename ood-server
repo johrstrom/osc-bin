@@ -2,14 +2,16 @@
 
 function show_help(){
   echo "Helper script to run Open OnDemand Conainters."
-  echo "ood-server [OPTION] [start|stop|restart]"
+  echo "ood-server [OPTIONS] [start|stop|restart]"
   echo ""
-  echo "  -h|--help   show this message"
-  echo "  -p|--port   specify the port you want to bind to"
-  echo "  -i|--img    specify the image you want to boot"
+  echo "  -h|--help             show this message"
+  echo "  -p|--port <port>      specify the port you want to bind to (8080 is the default)"
+  echo "  -i|--img  <name>      specify the image you want to boot"
+  echo "  -c|--ctr-name <name>  the name of the container (ood is the default)"
+  echo "  -n|--network          bind to the hosts network stack (default is false)"
 }
 
-IMG="ood-${USER}:latest"
+IMG="ood:dev"
 
 CTR_NAME="ood"
 PORT="8080"
@@ -76,6 +78,7 @@ fi
 
 ARGS="${ARGS} --rm=true --security-opt label=disable -v $OOD_APP_DEV_DIR:$HOME/ondemand/dev"
 ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:8080 --name=$CTR_NAME"
+ARGS="${ARGS} --cap-add sys_ptrace"
 
 if [ $HOST_NETWORK ]; then
   ARGS="${ARGS} --network=host"
@@ -83,7 +86,17 @@ fi
 
 function start_server() {
   LOG="/tmp/ood-container-$PORT.out"
-  podman run ${ARGS} ${IMG} > $LOG 2>&1 &
+  tries=0
+
+  while [ $tries -lt 3 ]; do
+    podman run ${ARGS} ${IMG} > $LOG 2>&1 &
+    if ! podman inspect "$CTR_NAME" >/dev/null 2>&1; then
+       sleep 1
+       tries=$((tries+1))
+    else
+       tries=100
+    fi
+  done
 }
 
 function stop_server() {
