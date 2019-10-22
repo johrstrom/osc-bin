@@ -1,0 +1,11 @@
+#!/bin/sh
+
+MNTS="-v $(pwd):/mnt -v /etc/profile:/etc/profile"
+
+
+
+ARGS="--rm=true --security-opt label=disable"
+
+ARGS="$ARGS $MNTS"
+
+podman run ${ARGS} koalaman/shellcheck $@

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+COMMAND="sphinx-$1"
+
+ARGS=(--rm=true -v $PWD:/doc --userns=keep-id)
+ARGS+=(--security-opt label=disable)
+
+IMG="ohiosupercomputer/docker-sphinx"
+
+echo "sphinx executing with $@"
+
+podman run "${ARGS[@]}" "$IMG" "$COMMAND" "${@:2}"
+
