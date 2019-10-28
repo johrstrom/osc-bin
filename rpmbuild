@@ -1,0 +1,20 @@
+#!/bin/bash
+
+CTR_HOME="$HOME"
+CTR_PATH="/home/jeff/bin:/opt/rh/rh-nodejs10/root/usr/bin:/opt/rh/rh-ruby25/root/usr/local/bin:/opt/rh/rh-ruby25/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+CTR_LD="/opt/rh/rh-nodejs10/root/usr/lib64:/opt/rh/rh-ruby25/root/usr/local/lib64:/opt/rh/rh-ruby25/root/usr/lib64"
+
+MNTS=(-v "$HOME/rpmbuild:$HOME/rpmbuild")
+MNTS+=(-v "$PWD:/work" )
+MNTS+=(-v "$HOME/.gem:$HOME/.gem")
+
+ARGS=("--rm" "--userns=keep-id" "--security-opt" "label=disable")
+ARGS+=("${MNTS[@]}")
+ARGS+=("-w=/work")
+ARGS+=(-e "PATH=$CTR_PATH" -e "LD_LIBRARY_PATH=$CTR_LD")
+
+IMG="ood-dev:latest"
+
+podman run "${ARGS[@]}" "$IMG" rpmbuild "$@"
+#podman run "${ARGS[@]}" "$IMG" "$@"
+#echo podman run "${ARGS[@]}" "$IMG" "$@"
