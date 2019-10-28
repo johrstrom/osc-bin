@@ -16,5 +16,3 @@ ARGS+=(-e "PATH=$CTR_PATH" -e "LD_LIBRARY_PATH=$CTR_LD")
 IMG="ood-dev:latest"
 
 podman run "${ARGS[@]}" "$IMG" rpmbuild "$@"
-#podman run "${ARGS[@]}" "$IMG" "$@"
-#echo podman run "${ARGS[@]}" "$IMG" "$@"
