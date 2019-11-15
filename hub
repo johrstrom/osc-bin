@@ -1,0 +1,12 @@
+#!/bin/bash
+
+IMG="hub:latest"
+
+ARGS=(--rm -v "$PWD:/work" '--security-opt' 'label=disable')
+ARGS+=(-v "$HOME/.gitconfig:$HOME/.gitconfig")
+ARGS+=(-v "$HOME/.ssh:$HOME/.ssh")
+ARGS+=(-v "$HOME/.config/hub:$HOME/.config/hub")
+ARGS+=('--userns=keep-id') 
+ARGS+=("-w=/work")
+
+podman run -it "${ARGS[@]}" "$IMG" hub "$@"
