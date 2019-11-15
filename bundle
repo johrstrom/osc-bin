@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ARGS=(-v "$PWD:/work" "--workdir=/work")
+ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
+
+podman run ${ARGS[@]} ood:test bundle "$@"
+#podman run ${ARGS[@]} ood:test $@
