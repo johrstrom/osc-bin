@@ -11,7 +11,8 @@ function show_help(){
   echo "  -n|--network          bind to the hosts network stack (default is false)"
 }
 
-IMG="ood:dev"
+#IMG="ood:dev"
+IMG="ood:src-user"
 
 CTR_NAME="ood"
 PORT="8080"
@@ -68,6 +69,13 @@ if [ -d "$HOME/ondemand/dev" ]; then
   OOD_APP_DEV_DIR="$HOME/ondemand/dev"
 elif [ -z $OOD_APP_DEV_DIR ]; then
   OOD_APP_DEV_DIR=$HOME
+fi
+
+if [ "$IMG" == "ood:src-user" ] || [ "$IMG" == "ood:debian" ] ; then
+  ARGS="${ARGS} --entrypoint=/usr/local/bin/launch-httpd"
+  if [ "$IMG" == "ood:debian" ]; then
+    export CTR_ID="debian"
+  fi
 fi
 
 # load extra stuff if you want
