@@ -2,7 +2,6 @@
 
 WRK=$(echo $PWD | sed -e "s#$GOPATH#/go#g")
 IMG="go:extra"
-#IMG="golang:alpine"
 
 ARGS=(--rm -v "$GOPATH:/go" '--security-opt' 'label=disable')
 ARGS+=('--userns=keep-id') 
@@ -14,4 +13,3 @@ if [ -n "$GO111MODULE" ]; then
 fi
 
 podman run "${ARGS[@]}" "$IMG" go "$@"
-#podman run "${ARGS[@]}" golang:buster "$@"
