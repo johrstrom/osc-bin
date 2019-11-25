@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ARGS=(-v "$HOME/.local:/.local" -v "$HOME/.cache:/.cache")
+ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
+
+podman run ${ARGS[@]} python:3 pip "$@"

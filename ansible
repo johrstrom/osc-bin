@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CTR_PATH="/usr/local/bin:/usr/local/sbin:/usr/local/bin"
+CTR_PATH="$CTR_PATH:/usr/sbin:/usr/bin:/sbin:/bin"
+
+ARGS=(-v "$HOME/.local:/.local" -v "$HOME/.cache:/.cache")
+ARGS+=(-v "$HOME/.config/ansible/ansible.cfg:/etc/ansible/ansible.cfg")
+ARGS+=(-v "$HOME/.ansible:/.ansible")
+ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
+ARGS+=(-e PATH="$CTR_PATH:/.local/bin")
+
+podman run ${ARGS[@]} python:3 ansible "$@"
