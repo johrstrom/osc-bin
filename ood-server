@@ -11,7 +11,6 @@ function show_help(){
   echo "  -n|--network          bind to the hosts network stack (default is false)"
 }
 
-#IMG="ood:dev"
 IMG="ood:src-user"
 
 CTR_NAME="ood"
@@ -73,6 +72,8 @@ fi
 
 if [ "$IMG" == "ood:src-user" ] || [ "$IMG" == "ood:debian" ] ; then
   ARGS="${ARGS} --entrypoint=/usr/local/bin/launch-httpd"
+
+  # export a debian flag so the  ood-server.env file can mount the correct files
   if [ "$IMG" == "ood:debian" ]; then
     export CTR_ID="debian"
   fi
@@ -86,7 +87,8 @@ fi
 
 ARGS="${ARGS} --rm=true --security-opt label=disable -v $OOD_APP_DEV_DIR:$HOME/ondemand/dev"
 ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:8080 --name=$CTR_NAME"
-ARGS="${ARGS} --cap-add sys_ptrace"
+# need sys_ptrace cuz passenger needs to read /proc/N/environ for all N for whatever reason
+ARGS="${ARGS} --cap-add=sys_ptrace"
 
 if [ $HOST_NETWORK ]; then
   ARGS="${ARGS} --network=host"

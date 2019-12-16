@@ -13,16 +13,19 @@ function stop_ctr(){
 }
 
 function start_ctr(){
-  MNTS="-v $HOME/.gem:$HOME/.gem -v $HOME/.solargraph:$HOME/.solargraph"
-  MNTS="${MNTS} -v $HOME/.bundle:$HOME/.bundle"
-  MNTS="${MNTS} -v $HOME/src/misc/ctr-bin:$HOME/bin"
-  MNTS="${MNTS} -v $HOME/.config/ondemand/ood-container.bashrc:$HOME/.bashrc"
+  ARGS=("--rm")
+  ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
+  ARGS+=(-v "$HOME/.gem:$HOME/.gem")
+  ARGS+=(-v "$HOME/.gem/ruby:/var/lib/gems/2.5.0")
+  ARGS+=(-v "$HOME/src/misc/ctr-bin:/usr/local/bin")
+  ARGS+=(-v "$HOME/.solargraph:$HOME/.solargraph")
+  ARGS+=(-p "7658:7658" "--name=solargraph")
 
-  ARGS="${ARGS} --rm=true --security-opt label=disable --userns=keep-id"
-  ARGS="${ARGS} ${MNTS} -p 7658:7658 --name=solargraph"
+  EXE="/usr/local/bin/solargraph"
+  CTR_CMD="$EXE socket --host=0.0.0.0"
+  IMG="ood:test"
 
-  CTR_CMD="$HOME/bin/ruby-wrapper solargraph socket --host=0.0.0.0"
-  podman run $ARGS ood-dev $CTR_CMD > /tmp/solargraph.out 2>&1 &
+  podman run ${ARGS[@]} "$IMG" $CTR_CMD > /tmp/solargraph.out 2>&1 &
 }
 
 if [ "$CMD" == "start" ]; then
