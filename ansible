@@ -15,6 +15,10 @@ ARGS+=(-v "$HOME/.ssh:$HOME/.ssh")
 ARGS+=('--security-opt' 'label=disable'' --userns=keep-id' '-t')
 ARGS+=(-e PATH="$CTR_PATH:$CTR_HOME/.local/bin")
 ARGS+=(-i)
+ARGS+=(-e GCP_AUTH_KIND="$GCP_AUTH_KIND" -e GCP_SERVICE_ACCOUNT_FILE="$GCP_SERVICE_ACCOUNT_FILE")
+ARGS+=(-v "$HOME/.kube:$CTR_HOME/.kube")
+ARGS+=(-e K8S_AUTH_KUBECONFIG="$CTR_HOME/.kube/config")
+
 # args for using containers, i.e., having contianers as a part of your inventory
 #CTR_LIB="/usr/lib/x86_64-linux-gnu"
 #ARGS+=(-v "$HOME/.config/containers:$HOME/.config/containers")
