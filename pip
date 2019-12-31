@@ -1,6 +1,9 @@
 #!/bin/bash
 
-ARGS=(-v "$HOME/.local:/.local" -v "$HOME/.cache:/.cache")
+ARGS=(-v "$HOME/.local:/work/.local" -v "$HOME/.cache:/work/.cache")
 ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
+ARGS+=('--rm')
+# in case you want to install tar
+ARGS+=(-v "$PWD:/work" "--workdir=/work")
 
 podman run ${ARGS[@]} python:3 pip "$@"
