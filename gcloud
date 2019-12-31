@@ -1,0 +1,19 @@
+#!/bin/bash
+
+CTR_HOME=$HOME
+
+ARGS=('--security-opt' 'label=disable'' --userns=keep-id')
+ARGS=(-v "$PWD:/$CTR_HOME" "--workdir=$CTR_HOME")
+ARGS+=(-v "$HOME/.config/gcloud:$CTR_HOME/.config/gcloud")
+ARGS+=(-v "$HOME/.ssh:$CTR_HOME/.ssh")
+ARGS+=(-v "$HOME/.kube:$CTR_HOME/.kube")
+ARGS+=(-i)
+
+ARGS+=(-e "CLOUDSDK_CONFIG=$CTR_HOME/.config/gcloud")
+#ARGS+=(-e "KUBECONFIG=$CTR_HOME/.kube/gke-config")
+ARGS+=(-e "KUBECONFIG=$KUBECONFIG")
+
+IMG="google/cloud-sdk:slim"
+
+#podman run ${ARGS[@]} $IMG $(basename "$0") "$@"
+podman run ${ARGS[@]} $IMG gcloud "$@"
