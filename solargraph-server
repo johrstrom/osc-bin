@@ -9,23 +9,12 @@ fi
 CMD=$1
 
 function stop_ctr(){
-  podman kill solargraph
+  CTR=$(podman ps | grep solargraph | awk '{print $1}')
+  podman kill $CTR
 }
 
 function start_ctr(){
-  ARGS=("--rm")
-  ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
-  ARGS+=(-v "$HOME/.gem:$HOME/.gem")
-  ARGS+=(-v "$HOME/.gem/ruby:/var/lib/gems/2.5.0")
-  ARGS+=(-v "$HOME/src/misc/ctr-bin:/usr/local/bin")
-  ARGS+=(-v "$HOME/.solargraph:$HOME/.solargraph")
-  ARGS+=(-p "7658:7658" "--name=solargraph")
-
-  EXE="/usr/local/bin/solargraph"
-  CTR_CMD="$EXE socket --host=0.0.0.0"
-  IMG="ood:test"
-
-  podman run ${ARGS[@]} "$IMG" $CTR_CMD > /tmp/solargraph.out 2>&1 &
+  RUBY_PORT=7658 solargraph socket --host=0.0.0.0 > /tmp/solargraph.out 2>&1 &
 }
 
 if [ "$CMD" == "start" ]; then
