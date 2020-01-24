@@ -2,7 +2,7 @@
 
 CTR_HOME=$HOME
 
-ARGS=('--security-opt' 'label=disable'' --userns=keep-id')
+ARGS=('--security-opt' 'label=disable'' --userns=keep-id' '--rm')
 ARGS=(-v "$PWD:/$CTR_HOME" "--workdir=$CTR_HOME")
 ARGS+=(-v "$HOME/.config/gcloud:$CTR_HOME/.config/gcloud")
 ARGS+=(-v "$HOME/.ssh:$CTR_HOME/.ssh")
