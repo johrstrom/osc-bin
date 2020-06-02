@@ -70,11 +70,11 @@ elif [ -z $OOD_APP_DEV_DIR ]; then
   OOD_APP_DEV_DIR=$HOME
 fi
 
-if [ "$IMG" == "ood:src-user" ] || [ "$IMG" == "ood:debian" ] ; then
+if [[ "$IMG" == "ood:src-user" ]] || [[ "$IMG" == "ood:ubuntu" ]] || [[ "$IMG" == "ood:debian" ]]; then
   ARGS="${ARGS} --entrypoint=/usr/local/bin/launch-httpd"
 
   # export a debian flag so the  ood-server.env file can mount the correct files
-  if [ "$IMG" == "ood:debian" ]; then
+  if [[ "$IMG" == "ood:debian" ]] || [[ "$IMG" == "ood:ubuntu" ]]; then
     export CTR_ID="debian"
   fi
 fi

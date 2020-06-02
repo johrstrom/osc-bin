@@ -1,0 +1,96 @@
+#!/bin/bash
+
+COMMAND="$(basename "$0")"
+
+# add all the insane paths for SCLs
+RUBY="rh-ruby25"
+NODE="rh-nodejs10"
+CTR_PATH="/opt/rh/$NODE/root/usr/bin:/opt/rh/$RUBY/root/usr/local/bin:$HOME/bin"
+CTR_PATH="$CTR_PATH:/opt/rh/$RUBY/root/usr/bin:/usr/local/sbin"
+CTR_PATH="$CTR_PATH:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+CTR_PATH="$CTR_PATH:$HOME/.local/bin"
+CTR_PATH="$CTR_PATH:/run/host/usr/local/bin:/run/host/usr/local/sbin:/run/host/usr/bin:/run/host/usr/sbin"
+
+LD_PATH="/opt/rh/$NODE/root/usr/lib64:/opt/rh/$RUBY/root/usr/local/lib64:/opt/rh/$RUBY/root/usr/lib64"
+LD_PATH="$LD_PATH:/usr/lib64"
+LD_PATH="$LD_PATH:/usr/lib64:/run/host/usr/lib:/run/host/usr/lib64"
+
+CTR_NAME="$COMMAND-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 8)"
+
+ARGS=('--rm' '-it')
+ARGS+=('--user' "$USER:$USER" '--userns=keep-id' '--hostname' "$CTR_NAME")
+
+# lots of args to build containers
+ARGS+=( '--ipc' 'host' '--network' 'host' '--no-hosts' '--pid' 'host')
+ARGS+=('--privileged' '--security-opt' 'label=disable')
+ARGS+=('--device' '/dev/fuse')
+ARGS+=('--pid' 'host')
+
+# mounts
+ARGS+=(-v "$HOME/.gem:$HOME/.gem")
+ARGS+=(-v "$PWD:$PWD" "--workdir=$PWD")
+ARGS+=(-v "$HOME/.bundle:$HOME/.bundle")
+ARGS+=(-v "$HOME/.local/share:$HOME/.local/share")
+ARGS+=(-v "$HOME/.local/bin:$HOME/.local/bin")
+ARGS+=(-v "$HOME/.config:$HOME/.config")
+ARGS+=(-v "$HOME/src/misc/ctr-bin:$HOME/bin")
+ARGS+=(-v "/usr/bin/fuse-overlayfs:/usr/bin/fuse-overlayfs")
+ARGS+=(-v "$HOME/.vim:$HOME/.vim")
+ARGS+=(-v "$HOME/rpmbuild:$HOME/rpmbuild")
+#ARGS+=(-v "/var/tmp:/var/tmp")
+#ARGS+=(-v "/run/user/$UID:/run/user/$UID")
+#ARGS+=(-v "/etc:/run/host/etc")
+#ARGS+=(-v "/dev:/dev:rslave") 
+#ARGS+=(-v "/run:/run/host/run:rslave")
+#ARGS+=(-v "/tmp:/run/host/tmp:rslave")
+#ARGS+=(-v "/usr:/run/host/usr:ro,rslave")
+#ARGS+=(-v "/var:/run/host/var:rslave")
+
+# --volume /usr:/run/host/usr:"$usr_mount_destination_flags",rslave \
+#ARGS+=(-v "/usr/lib64/libseccomp.so.2:/usr/lib64/libseccomp.so.2")
+#ARGS+=(-v "/usr/lib64/libseccomp.so.2.4.2:/usr/lib64/libseccomp.so.2.4.2")
+
+# container related items
+#ARGS+=(-v "/etc/containers:/etc/containers")
+#ARGS+=(-v "/usr/lib64/libc.so.6:/usr/lib64/libc.so.6")
+#ARGS+=(-v "/usr/lib64/libc-2.29.so:/usr/lib64/libc-2.29.so")
+
+
+# keep the tmp dir
+#ARGS+=(-v "/tmp:/tmp")
+
+# environment variables
+ARGS+=(-e "PATH=$CTR_PATH" -e "LD_LIBRARY_PATH=$LD_PATH")
+ARGS+=(-e "HOME=$HOME" -e "GEM_HOME=$HOME/.gem/ruby" )
+ARGS+=(-e "THOR_MERGE=vimdiff" -e "TERM=xterm-256color")
+ARGS+=(-e "BUNDLE_GEMFILE=Gemfile")
+ARGS+=(-e '_BUILDAH_STARTED_IN_USERNS=""' -e 'BUILDAH_ISOLATION=chroot')
+
+
+## these don't work right when they're notset
+if [[ -n "$VENDOR_BUNDLE" ]]; then
+  ARGS+=(-e "VENDOR_BUNDLE=$VENDOR_BUNDLE") 
+fi
+
+if [[ -n "$BUNDLE_PATH" ]]; then
+  ARGS+=(-e "BUNDLE_PATH=$BUNDLE_PATH")
+fi
+
+# nginx/passenger build flags
+#ARGS+=(-e "CXX_FLAGS=-no-pie" -e "CXXFLAGS=-no-pie" -e "CFLAGS=-no-pie")
+#ARGS+=(-e "EXTRA_CXXFLAGS=-fPIE")
+
+
+# hack for solargraph
+if [ -n "$RUBY_PORT" ]; then
+  ARGS+=(-p "$RUBY_PORT:$RUBY_PORT")
+fi
+
+if [[ -n "$RUBY_DEBUG" ]] && [[ $RUBY_DEBUG ]]; then
+  ARGS+=('--log-level=debug')
+fi
+
+IMG="ood:dev"
+#IMG="ood:dev-fedora"
+
+podman run "${ARGS[@]}" "$IMG" "$COMMAND" "$@"

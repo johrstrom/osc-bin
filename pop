@@ -2,8 +2,10 @@
 
 ARGS=(-v "$HOME/.local:/work/.local" -v "$HOME/.cache:/work/.cache")
 ARGS+=('--security-opt' 'label=disable'' --userns=keep-id')
-ARGS+=('--rm')
+ARGS+=('--rm' '-it')
 # in case you want to install tar
 ARGS+=(-v "$PWD:/work" "--workdir=/work")
 
-podman run ${ARGS[@]} python:3 pip "$@"
+IMG="python:3.7"
+
+podman run ${ARGS[@]} "$IMG" pip "$@"

@@ -1,15 +1,22 @@
 #!/bin/bash
 
-WRK=$(echo $PWD | sed -e "s#$GOPATH#/go#g")
+WRK=$PWD
+# go:extra has a little bit extra packages like selinux or other .so libs
 IMG="go:extra"
 
-ARGS=(--rm -v "$GOPATH:/go" '--security-opt' 'label=disable')
+# GOHOME used here is $HOME/src/go (for me). Can't use GOPATH bc some ppl
+# (*cough* runc *cough*) add to GOPATH which makes it /go/path:/added/thing.
+# try to mount $GOPATH:/go and isn't a valid podman mount arg anymore
+ARGS=(--rm -v "$GOHOME:$GOHOME" '--security-opt' 'label=disable')
 ARGS+=('--userns=keep-id') 
-ARGS+=("-w=$WRK")
-#ARGS+=(-v "/usr/include:/usr/include")
+ARGS+=("-w=$PWD")
+
+ARGS+=(-e "GOPATH=$GOPATH")
 
 if [ -n "$GO111MODULE" ]; then
   ARGS+=(-e "GO111MODULE=$GO111MODULE" )
 fi
+
+echo $@
 
 podman run "${ARGS[@]}" "$IMG" go "$@"

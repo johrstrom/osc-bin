@@ -1,9 +1,14 @@
 #!/bin/bash
 
+clean_from(){
+  CRI=$1
+  images=$("$CRI" images -f "dangling=true" | awk '{print $3}' | grep -v IMAGE)
 
-images=$(buildah images -f "dangling=true" | awk '{print $3}' | grep -v IMAGE)
+  for i in $images
+  do
+    "$CRI" rmi $i
+  done
+}
 
-for i in $images
-do
-	buildah rmi $i
-done
+clean_from 'buildah'
+clean_from 'docker'

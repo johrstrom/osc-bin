@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export STAY_ME_STAY_COOL='beme 4life'
+
+source "$HOME/.config/ondemand/ood-server.env"
+
+ARGS="--rm=true --userns=keep-id --security-opt label=disable -it"
+ARGS="$ARGS $EXTRA_ARGS"
+
+IMG="ood:dev"
+#IMG="ood:test"
+
+podman run $ARGS "$IMG" /bin/bash

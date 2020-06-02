@@ -3,11 +3,14 @@
 function clean_from() {
   if [ $1 == "podman" ]; then
       ls_cmd="podman container ls -a"
-      rm_cmd="podman container rm"
+      rm_cmd="podman rm"
 
   elif [ $1 == "buildah" ]; then
       ls_cmd="buildah containers"
       rm_cmd="buildah rm"
+  elif [ $1 == "docker" ]; then
+      ls_cmd="docker ps -a"
+      rm_cmd="docker rm"
   fi
 
   containers=$( $ls_cmd | awk '{print $1}' | grep -v CONTAINER)
@@ -21,3 +24,4 @@ function clean_from() {
 
 clean_from "podman"
 clean_from "buildah"
+clean_from "docker"
