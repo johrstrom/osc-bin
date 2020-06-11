@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export CTR_NAME=solargraph
 
 if [ -z $1 ]; then
   echo 'you must specify $1 as [start/stop/restart]'
@@ -10,7 +11,7 @@ CMD=$1
 
 function stop_ctr(){
   CTR=$(podman ps | grep solargraph | awk '{print $1}')
-  podman kill $CTR
+  podman kill $CTR_NAME
 }
 
 function start_ctr(){
