@@ -2,15 +2,19 @@
 
 COMMAND="$(basename "$0")"
 
-# add all the insane paths for SCLs
-CTR_NAME="$COMMAND-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 8)"
+CTR_HOST_NAME="$COMMAND-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 8)"
+
+if [[ -z ${CTR_NAME+x} ]]; then
+  CTR_NAME=$CTR_HOST_NAME
+fi
 
 ARGS=('--rm' '-it')
 #ARGS+=('--user' "$USER:$USER")
 #ARGS+=('--user' "$(id -u):$(id -g)")
 #ARGS+=('--userns=keep-id')
 ARGS+=('--userns=host')
-ARGS+=('--hostname' "$CTR_NAME")
+ARGS+=('--hostname' "$CTR_HOST_NAME")
+ARGS+=('--name' "$CTR_NAME")
 
 # lots of args to build containers
 ARGS+=( '--ipc' 'host' '--network' 'host' '--no-hosts' '--pid' 'host')
@@ -62,8 +66,6 @@ if [[ -n "$RUBY_DEBUG" ]] && [[ $RUBY_DEBUG ]]; then
   ARGS+=('--log-level=debug')
 fi
 
-#IMG="ood:dev"
-#IMG="ood:build-deb"
-IMG="ood:build-fedora"
+IMG="ood-build:fedora"
 
 podman run "${ARGS[@]}" "$IMG" "$COMMAND" "$@"
