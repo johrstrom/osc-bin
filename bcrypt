@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+import bcrypt, sys
+
+if __name__ == '__main__':
+  input = sys.argv[0].encode('UTF-8')
+  hsh = bcrypt.hashpw(input, bcrypt.gensalt())
+  print(hsh.decode("utf-8"))
