@@ -30,6 +30,7 @@ ARGS+=(-v "$HOME/.config:$HOME/.config")
 ARGS+=(-v "$HOME/src/misc/ctr-bin:$HOME/bin")
 ARGS+=(-v "$HOME/.vim:$HOME/.vim")
 ARGS+=(-v "$HOME/rpmbuild:$HOME/rpmbuild")
+ARGS+=(-v "$HOME/.cache:$HOME/.cache")
 ARGS+=(-v "/var/tmp:/var/tmp")
 ARGS+=('--device=/dev/urandom' '--device=/dev/urandom')
 
