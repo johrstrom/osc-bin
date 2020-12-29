@@ -15,6 +15,8 @@ ARGS=('--rm' '-it')
 ARGS+=('--userns=host')
 ARGS+=('--hostname' "$CTR_HOST_NAME")
 ARGS+=('--name' "$CTR_NAME")
+# FU runc always warning 'no directory specified for freezer.state'
+ARGS+=('--runtime' '/usr/bin/crun')
 
 # lots of args to build containers
 ARGS+=( '--ipc' 'host' '--network' 'host' '--no-hosts' '--pid' 'host')
@@ -32,6 +34,7 @@ ARGS+=(-v "$HOME/.vim:$HOME/.vim")
 ARGS+=(-v "$HOME/rpmbuild:$HOME/rpmbuild")
 ARGS+=(-v "$HOME/.cache:$HOME/.cache")
 ARGS+=(-v "/var/tmp:/var/tmp")
+ARGS+=(-v "/tmp:/tmp")
 ARGS+=('--device=/dev/urandom' '--device=/dev/urandom')
 
 # bc we're running as root

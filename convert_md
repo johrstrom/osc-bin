@@ -1,0 +1,19 @@
+#!/bin/bash
+
+
+INPUT_MD="$1"
+
+if [[ -z "$1" ]]; then
+  echo 'you must specify $1 as the input file'
+  exit 1
+fi
+
+
+DIR=$PWD
+FNAME="${INPUT_MD%.*}"
+HTML="$FNAME.html"
+
+cp $INPUT_MD /tmp
+cd /tmp
+pandoc -o $HTML -f markdown $INPUT_MD
+mv "$HTML" "$DIR"

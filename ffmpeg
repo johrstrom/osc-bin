@@ -1,0 +1,9 @@
+#!/bin/bash
+
+podman run \
+  -v "$PWD:$PWD:rw" \
+  --workdir="$PWD" \
+  --userns="keep-id" \
+  --security-opt "label=disable" \
+  linuxserver/ffmpeg \
+  $@

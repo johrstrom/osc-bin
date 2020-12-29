@@ -1,0 +1,12 @@
+#!/bin/bash
+
+IMG="jagregory/pandoc"
+
+#'--security-opt' 'label=disable' \
+#--userns='keep-id' \
+
+podman run --rm --workdir=/work \
+  -v "$PWD:/work" \
+  --userns='keep-id' \
+  '--security-opt' 'label=disable' \
+  "$IMG" $@

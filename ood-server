@@ -11,9 +11,9 @@ function show_help(){
   echo "  -n|--network          bind to the hosts network stack (default is false)"
 }
 
-IMG="ood:latest-user"
+IMG="ood-dev:latest"
 
-CTR_NAME="ood"
+CTR_NAME="ood-dev"
 PORT="8080"
 
 for arg in "$@"
@@ -81,9 +81,9 @@ if [ -f "$EXTRAS_FILE" ]; then
   . $EXTRAS_FILE
 fi
 
-ARGS="${ARGS} --entrypoint=/usr/local/bin/launch-httpd"
+#ARGS="${ARGS} --entrypoint=/usr/local/bin/launch-httpd"
 ARGS="${ARGS} --rm=true --security-opt label=disable -v $OOD_APP_DEV_DIR:$HOME/ondemand/dev"
-ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:8080 --name=$CTR_NAME"
+ARGS="${ARGS} --userns=keep-id ${EXTRA_ARGS} -p ${PORT}:8080 -p 5556:5556 --name=$CTR_NAME"
 # need sys_ptrace cuz passenger needs to read /proc/N/environ for all N for whatever reason
 ARGS="${ARGS} --cap-add=sys_ptrace"
 
@@ -92,7 +92,7 @@ if [ $HOST_NETWORK ]; then
 fi
 
 function start_server() {
-  LOG="/var/tmp/ood-container-$PORT.out"
+  LOG="/var/tmp/ood/container-$PORT.out"
   tries=0
 
   while [ $tries -lt 3 ]; do

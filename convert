@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ARGS=('--rm' '-v' "$PWD:$PWD" "--workdir=$PWD")
+ARGS+=('--userns=keep-id' '--security-opt' 'label=disable')
+
+#IMG="buildpack-deps:bullseye"
+IMG="image-magic:latest"
+
+podman run "${ARGS[@]}" "$IMG" $(basename "$0") "$@"

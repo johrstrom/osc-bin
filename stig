@@ -1,0 +1,16 @@
+#!/bin/bash
+
+IMG="stig-viewer:latest"
+
+cd "$HOME/ondemand/misc/stig"
+
+ARGS=('--userns=keep-id')
+ARGS+=('-v' "$PWD:/work" '--workdir=/work')
+ARGS+=('--name' "stig" '--rm' '-d')
+ARGS+=('--security-opt' 'label=disable')
+ARGS+=('-v' "/tmp/.X11-unix:/tmp/.X11-unix")
+ARGS+=('-e' "DISPLAY=$DISPLAY")
+
+#ARGS+=('-it' '--entrypoint=/bin/bash')
+
+podman run "${ARGS[@]}" "$IMG"

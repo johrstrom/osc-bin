@@ -1,0 +1,60 @@
+#!/bin/bash
+
+CTR_NAME="dex"
+IMG="dex:v2.24.0"
+
+for arg in "$@"
+do
+  case $arg in
+    start)
+    START=true
+    shift
+    ;;
+
+    stop)
+    STOP=true
+    shift
+    ;;
+
+    restart)
+    RESTART=true
+    shift
+    ;;
+esac
+done
+
+ARGS=(-v '/home/jeff/ondemand/misc/dex_config:/config:rw' '--rm')
+ARGS+=(--network=host)
+ARGS+=(--user "0:0")
+ARGS+=(--name="$CTR_NAME")
+
+function start_server() {
+  LOG="/var/tmp/ood/dex.out"
+  tries=0
+
+  while [ $tries -lt 3 ]; do
+    podman run ${ARGS[@]} $IMG serve /config/config.yml > $LOG 2>&1 &
+    if ! podman exec "$CTR_NAME" ls >/dev/null 2>&1; then
+       sleep 1
+       tries=$((tries+1))
+    else
+       tries=100
+    fi
+  done
+}
+
+function stop_server(){
+  podman kill $CTR_NAME >/dev/null
+}
+
+if [ "$START" ]; then
+  start_server
+elif [ "$STOP" ]; then
+  stop_server
+elif [ "$RESTART" ]; then
+  stop_server
+  start_server
+else
+  echo "you must specify one of [stop,start,restart]"
+  exit 1
+fi
